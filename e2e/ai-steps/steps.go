@@ -7,6 +7,7 @@ import (
     "github.com/carlory/ai-conformance/e2e/ai-steps/accelerators"
     "github.com/carlory/ai-conformance/e2e/ai-steps/networking"
     "github.com/carlory/ai-conformance/e2e/ai-steps/security"
+    "github.com/carlory/ai-conformance/e2e/ai-steps/orchestration"
 )
 
 func InitializeScenario(ctx *godog.ScenarioContext, m *testing.M) {
@@ -14,4 +15,5 @@ func InitializeScenario(ctx *godog.ScenarioContext, m *testing.M) {
     accelerators.InitializeSteps(ctx)
     networking.InitializeSteps(ctx)
     security.InitializeSteps(ctx)
+    orchestration.InitializeSteps(ctx)
 }
