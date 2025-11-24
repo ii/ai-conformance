@@ -25,7 +25,7 @@ spec:
   env:
   - name: E2E_EXTRA_ARGS
     value: --progress-report-url=http://localhost:8099/progress --ai.operator.chart=kuberay-operator
-      --ai.operator.repo=https://ray-project.github.io/kuberay-helm/
+      --ai.operator.repo=https://ray-project.github.io/kuberay-helm/ --godog
   - name: E2E_FOCUS
     value: \[AIConformance\]
   - name: E2E_PARALLEL
