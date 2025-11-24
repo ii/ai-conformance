@@ -6,14 +6,17 @@ This directory contains Gherkin `.feature` files for AI Conformance testing, exe
 
 - `accelerators/`: Tests related to hardware accelerators (GPU, DRA, etc.).
 - `networking/`: Tests related to AI networking (Gateway API, etc.).
+- `security/`: Tests related to secure accelerator access (Device Plugin, etc.).
+- `orchestration/`: Tests related to workload scheduling and scaling (Kueue, Autoscaling).
+- `observability/`: Tests related to monitoring and metrics (Prometheus).
 - `embed.go`: Embeds the feature files into the test binary.
 
 ## Running Tests
 
-To run these tests, pass the `--godog` flag to the test binary:
+To run these tests, pass the `--features` flag to the test binary:
 
 ```bash
-./e2e.test --godog --kubeconfig ~/.kube/config
+./e2e.test --features --kubeconfig ~/.kube/config
 ```
 
 ## Adding New Tests
