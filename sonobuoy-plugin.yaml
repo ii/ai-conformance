@@ -36,6 +36,6 @@ spec:
     value: "true"
   - name: RESULTS_DIR
     value: /tmp/sonobuoy/results
-  image: ghcr.io/carlory/ai-conformance:latest
+  image: ghcr.io/ii/ai-conformance:latest
   name: plugin
 

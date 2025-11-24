@@ -81,9 +81,9 @@ import (
 )
 
 var (
-	runGoDogTests bool
+	runFeatureTests bool
 	stopOnFailure bool
-	godogJUnitFile string
+	featuresJUnitFile string
 )
 
 // handleFlags sets up all flags and parses the command line.
@@ -101,9 +101,9 @@ func TestMain(m *testing.M) {
 	flag.CommandLine.BoolVar(&versionFlag, "version", false, "Displays version information.")
 	listConformanceTests := flag.CommandLine.Bool("list-conformance-tests", false, "If true, will show list of conformance tests.")
 
-	flag.CommandLine.BoolVar(&runGoDogTests, "godog", false, "Set this flag is you want to run godog BDD tests")
+	flag.CommandLine.BoolVar(&runFeatureTests, "features", false, "Set this flag is you want to run Gherkin feature tests")
 	flag.CommandLine.BoolVar(&stopOnFailure, "stop-on-failure", false, "Stop processing on first failed scenario.. Flag is passed to godog")
-	flag.CommandLine.StringVar(&godogJUnitFile, "godog-junit-file", "", "Write godog JUnit results to this file.")
+	flag.CommandLine.StringVar(&featuresJUnitFile, "features-junit-file", "", "Write features JUnit results to this file.")
 
 	// Register test flags, then parse flags.
 	handleFlags()
@@ -111,31 +111,6 @@ func TestMain(m *testing.M) {
 	if versionFlag {
 		fmt.Printf("%s\n", version.Get())
 		os.Exit(0)
-	}
-
-	if runGoDogTests {
-		opts := godog.Options{
-			Format:        "pretty",
-			Paths:         []string{"."},
-			FS:            aifeatures.Features,
-			StopOnFailure: stopOnFailure,
-		}
-		if godogJUnitFile != "" {
-			opts.Format = "junit:" + godogJUnitFile
-		} else if framework.TestContext.SpecSummaryOutput != "" {
-			opts.Format = "junit:" + framework.TestContext.SpecSummaryOutput
-		} else if framework.TestContext.ReportDir != "" {
-			opts.Format = "junit:" + filepath.Join(framework.TestContext.ReportDir, "junit.xml")
-		}
-
-		status := godog.TestSuite{
-			Name: "ai-conformance",
-			ScenarioInitializer: func(ctx *godog.ScenarioContext) {
-				aisteps.InitializeScenario(ctx, m)
-			},
-			Options: &opts,
-		}.Run()
-		os.Exit(status)
 	}
 
 	if flag.CommandLine.NArg() > 0 {
@@ -174,6 +149,31 @@ func TestMain(m *testing.M) {
 	}
 
 	framework.AfterReadingAllFlags(&framework.TestContext)
+
+	if runFeatureTests {
+		opts := godog.Options{
+			Format:        "pretty",
+			Paths:         []string{"."},
+			FS:            aifeatures.Features,
+			StopOnFailure: stopOnFailure,
+		}
+		if featuresJUnitFile != "" {
+			opts.Format = "junit:" + featuresJUnitFile
+		} else if framework.TestContext.SpecSummaryOutput != "" {
+			opts.Format = "junit:" + framework.TestContext.SpecSummaryOutput
+		} else if framework.TestContext.ReportDir != "" {
+			opts.Format = "junit:" + filepath.Join(framework.TestContext.ReportDir, "junit_01.xml")
+		}
+
+		status := godog.TestSuite{
+			Name: "ai-conformance",
+			ScenarioInitializer: func(ctx *godog.ScenarioContext) {
+				aisteps.InitializeScenario(ctx, m)
+			},
+			Options: &opts,
+		}.Run()
+		os.Exit(status)
+	}
 
 	// TODO: Deprecating repo-root over time... instead just use gobindata_util.go , see #23987.
 	// Right now it is still needed, for example by

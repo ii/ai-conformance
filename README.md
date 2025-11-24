@@ -66,14 +66,21 @@ make test-e2e
 ```
 
 Run tests with Sonobuoy:
-```bash
-# Generate the Sonobuoy plugin yaml file
 make generate-plugin
 # Run tests with Sonobuoy
 make test-sonobuoy
+
+### Generating Plugin for Forked Repository
+
+If you are working on a forked repository and pushing your images to a different registry (e.g., `ghcr.io/your-user`), you need to specify your image registry when generating the Sonobuoy plugin:
+
+```bash
+make generate-plugin IMAGE_REGISTRY=ghcr.io/your-user
 ```
 
-Run tests with Hydrophone:
+Replace `ghcr.io/your-user` with your actual image registry (e.g., `ghcr.io/ii`).
+
+### Run tests with Hydrophone:
 ```bash
 make test-hydrophone
 ```
