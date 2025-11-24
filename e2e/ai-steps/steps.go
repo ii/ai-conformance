@@ -8,6 +8,7 @@ import (
     "github.com/carlory/ai-conformance/e2e/ai-steps/networking"
     "github.com/carlory/ai-conformance/e2e/ai-steps/security"
     "github.com/carlory/ai-conformance/e2e/ai-steps/orchestration"
+    "github.com/carlory/ai-conformance/e2e/ai-steps/observability"
 )
 
 func InitializeScenario(ctx *godog.ScenarioContext, m *testing.M) {
@@ -16,4 +17,5 @@ func InitializeScenario(ctx *godog.ScenarioContext, m *testing.M) {
     networking.InitializeSteps(ctx)
     security.InitializeSteps(ctx)
     orchestration.InitializeSteps(ctx)
+    observability.InitializeSteps(ctx)
 }
