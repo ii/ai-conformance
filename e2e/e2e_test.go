@@ -27,6 +27,10 @@ import (
 	"github.com/onsi/ginkgo/v2"
 	yaml "go.yaml.in/yaml/v2"
 
+	"github.com/cucumber/godog"
+	aifeatures "github.com/carlory/ai-conformance/e2e/ai-features"
+	aisteps "github.com/carlory/ai-conformance/e2e/ai-steps"
+
 	// Never, ever remove the line with "/ginkgo". Without it,
 	// the ginkgo test runner will not detect that this
 	// directory contains a Ginkgo test suite.
@@ -76,6 +80,12 @@ import (
 	_ "k8s.io/kubernetes/test/utils/format"
 )
 
+var (
+	runGoDogTests bool
+	stopOnFailure bool
+	godogJUnitFile string
+)
+
 // handleFlags sets up all flags and parses the command line.
 func handleFlags() {
 	config.CopyFlags(config.Flags, flag.CommandLine)
@@ -91,12 +101,41 @@ func TestMain(m *testing.M) {
 	flag.CommandLine.BoolVar(&versionFlag, "version", false, "Displays version information.")
 	listConformanceTests := flag.CommandLine.Bool("list-conformance-tests", false, "If true, will show list of conformance tests.")
 
+	flag.CommandLine.BoolVar(&runGoDogTests, "godog", false, "Set this flag is you want to run godog BDD tests")
+	flag.CommandLine.BoolVar(&stopOnFailure, "stop-on-failure", false, "Stop processing on first failed scenario.. Flag is passed to godog")
+	flag.CommandLine.StringVar(&godogJUnitFile, "godog-junit-file", "", "Write godog JUnit results to this file.")
+
 	// Register test flags, then parse flags.
 	handleFlags()
 
 	if versionFlag {
 		fmt.Printf("%s\n", version.Get())
 		os.Exit(0)
+	}
+
+	if runGoDogTests {
+		opts := godog.Options{
+			Format:        "pretty",
+			Paths:         []string{"."},
+			FS:            aifeatures.Features,
+			StopOnFailure: stopOnFailure,
+		}
+		if godogJUnitFile != "" {
+			opts.Format = "junit:" + godogJUnitFile
+		} else if framework.TestContext.SpecSummaryOutput != "" {
+			opts.Format = "junit:" + framework.TestContext.SpecSummaryOutput
+		} else if framework.TestContext.ReportDir != "" {
+			opts.Format = "junit:" + filepath.Join(framework.TestContext.ReportDir, "junit.xml")
+		}
+
+		status := godog.TestSuite{
+			Name: "ai-conformance",
+			ScenarioInitializer: func(ctx *godog.ScenarioContext) {
+				aisteps.InitializeScenario(ctx, m)
+			},
+			Options: &opts,
+		}.Run()
+		os.Exit(status)
 	}
 
 	if flag.CommandLine.NArg() > 0 {
